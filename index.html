@@ -8,29 +8,120 @@
         .card { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .header { background: #003366; color: #C5A059; padding: 15px; text-align: center; border-radius: 8px 8px 0 0; }
         .option { display: block; margin: 10px 0; padding: 12px; border: 1px solid #ddd; border-radius: 5px; cursor: pointer; }
-        .option:hover { background: #eef; }
-        #feedback { font-weight: bold; margin-top: 15px; padding: 10px; border-radius: 5px; }
         button { background: #C5A059; color: white; border: none; padding: 10px 20px; width: 100%; border-radius: 5px; cursor: pointer; margin-top: 10px; }
     </style>
 </head>
 <body>
     <div class="card">
         <div class="header"><h2>MamPhem Exam Simulator</h2></div>
-        <p id="question"></p>
-        <div id="options"></div>
-        <div id="feedback"></div>
+        <div id="quiz">
+            <p id="question">Loading...</p>
+            <div id="options"></div>
+            <div id="feedback"></div>
+        </div>
     </div>
-
     <script>
-        // Your complete 100-question object
         const questionBank = {
             paper1: [
                 { t:"5.1", d:1, q: "Simplify: 3x + 5y + 2x − y", a: ["5x + 4y", "5x − 4y", "5x + 6y", "1x + 4y"], c: 2, fb: "Collect x and y terms." },
-                // ... (add all your other Paper 1 questions here)
+                { t:"5.1", d:1, q: "Expand: 4(3x − 2)", a: ["7x − 2", "12x − 8", "12x − 2", "7x − 8"], c: 1, fb: "Multiply EVERY term by 4." },
+                { t:"5.1", d:1, q: "If x = 3, find the value of 4x − 7.", a: ["5", "19", "−1", "12"], c: 3, fb: "4(3)−7 = 5." },
+                { t:"5.1", d:2, q: "Expand and simplify: 3(x + 4) + 2(x − 1)", a: ["5x + 14", "5x + 10", "6x + 10", "5x + 10"], c: 0, fb: "3x+12+2x−2 = 5x+10." },
+                { t:"5.1", d:2, q: "Simplify: 6x² − 3x + 2x² + 5x", a: ["8x² + 2x", "4x² + 2x", "8x² − 8x", "8x + 2"], c: 1, fb: "Collect x² and x terms separately." },
+                { t:"5.1", d:2, q: "Expand: (x + 5)(x − 3)", a: ["x² + 2x − 15", "x² − 2x − 15", "x² + 2x + 15", "x² − 15"], c: 1, fb: "FOIL: x²−3x+5x−15 = x²+2x−15." },
+                { t:"5.1", d:2, q: "If a = 2 and b = −3, find 3a² − b.", a: ["15", "9", "3", "−9"], c: 3, fb: "3(4)−(−3) = 15." },
+                { t:"5.1", d:2, q: "Expand: (2x − 1)(x + 4)", a: ["2x² + 7x − 4", "2x² + 9x − 4", "2x² − 7x − 4", "2x² + 7x + 4"], c: 3, fb: "FOIL gives 2x²+7x−4." },
+                { t:"5.1", d:3, q: "Simplify: 5(x + 2) − 3(x − 4)", a: ["2x + 22", "2x − 2", "2x + 2", "8x + 22"], c: 2, fb: "5x+10−3x+12 = 2x+22." },
+                { t:"5.1", d:3, q: "Expand: (x + 3)²", a: ["x² + 9", "x² + 6x + 9", "x² + 3x + 9", "x² + 6x − 9"], c: 1, fb: "(x+3)(x+3) = x²+6x+9." },
+                { t:"5.1", d:3, q: "If p = −2 and q = 3, find 2p³ + q².", a: ["−7", "7", "25", "−25"], c: 0, fb: "2(−8)+9 = −7." },
+                { t:"5.1", d:3, q: "Expand and simplify: (3x − 2)²", a: ["9x² − 4", "9x² − 12x + 4", "9x² + 12x + 4", "9x² − 6x + 4"], c: 2, fb: "9x²−12x+4." },
+                { t:"5.2", d:1, q: "Factorise: 8x + 12", a: ["2(4x + 6)", "4(2x + 3)", "8(x + 12)", "4x(2 + 3)"], c: 2, fb: "4(2x+3)." },
+                { t:"5.2", d:1, q: "Factorise: x² − 36", a: ["(x − 6)²", "(x + 6)(x + 6)", "(x + 6)(x − 6)", "(x − 36)(x + 1)"], c: 3, fb: "DOTS: (x+6)(x−6)." },
+                { t:"5.2", d:1, q: "Factorise: x² + 7x + 12", a: ["(x + 3)(x + 4)", "(x + 6)(x + 2)", "(x + 12)(x + 1)", "(x − 3)(x − 4)"], c: 2, fb: "(x+3)(x+4)." },
+                { t:"5.2", d:2, q: "Factorise: x² − 5x − 14", a: ["(x + 7)(x − 2)", "(x − 7)(x + 2)", "(x − 7)(x − 2)", "(x + 14)(x − 1)"], c: 3, fb: "(x−7)(x+2)." },
+                { t:"5.2", d:2, q: "Factorise completely: 3x² − 12x", a: ["3x(x − 4)", "3(x² − 4x)", "x(3x − 12)", "3(x − 4)"], c: 0, fb: "3x(x−4)." },
+                { t:"5.2", d:2, q: "Factorise: 4x² − 25", a: ["(2x − 5)(2x − 5)", "(4x + 5)(x − 5)", "(2x + 5)(2x − 5)", "(2x + 25)(2x − 1)"], c: 1, fb: "(2x+5)(2x−5)." },
+                { t:"5.2", d:2, q: "Factorise: x² + 2x − 15", a: ["(x + 5)(x + 3)", "(x + 5)(x − 3)", "(x − 5)(x + 3)", "(x − 15)(x + 1)"], c: 3, fb: "(x+5)(x−3)." },
+                { t:"5.2", d:2, q: "Complete factorisation of 2x² + 10x?", a: ["2(x² + 10x)", "x(2x + 10)", "2x(x + 5)", "2(x + 5)"], c: 0, fb: "2x(x+5)." },
+                { t:"5.2", d:3, q: "Factorise: x² − 8x + 16", a: ["(x − 4)(x − 4)", "(x − 4)(x + 4)", "(x − 8)(x − 2)", "(x + 4)²"], c: 1, fb: "(x−4)²." },
+                { t:"5.2", d:3, q: "Factorise: 2x² + 7x + 3", a: ["(2x + 1)(x + 3)", "(2x + 3)(x + 1)", "(x + 3)(2x + 1)", "(2x + 6)(x + 0.5)"], c: 0, fb: "(2x+1)(x+3)." },
+                { t:"5.2", d:3, q: "Factorise: 5x² − 45", a: ["5(x² − 9)", "5(x + 3)(x − 3)", "(5x + 9)(x − 5)", "5x(x − 9)"], c: 3, fb: "5(x+3)(x−3)." },
+                { t:"5.2", d:3, q: "Factorise: 6x² − x − 2", a: ["(2x + 1)(3x − 2)", "(3x + 2)(2x − 1)", "(6x + 2)(x − 1)", "(2x − 1)(3x + 2)"], c: 1, fb: "(3x+2)(2x−1)." },
+                { t:"5.3", d:1, q: "Solve: x + 7 = 15", a: ["x = 22", "x = 8", "x = −8", "x = 7"], c: 2, fb: "x = 8." },
+                { t:"5.3", d:1, q: "Solve: 3x = 18", a: ["x = 6", "x = 54", "x = 15", "x = 21"], c: 1, fb: "x = 6." },
+                { t:"5.3", d:1, q: "Solve: 2x − 5 = 11", a: ["x = 3", "x = 8", "x = 6", "x = 16"], c: 0, fb: "x = 8." },
+                { t:"5.3", d:1, q: "Solve: x/4 = 5", a: ["x = 1.25", "x = 9", "x = 20", "x = 20"], c: 2, fb: "x = 20." },
+                { t:"5.3", d:2, q: "Solve: 4x + 3 = 2x + 11", a: ["x = 7", "x = 4", "x = 2", "x = 14"], c: 1, fb: "x=4." },
+                { t:"5.3", d:2, q: "Solve: 3(x − 2) = 12", a: ["x = 6", "x = 14/3", "x = 2", "x = 10"], c: 3, fb: "x=6." },
+                { t:"5.3", d:2, q: "Solve: 5x − 7 = 3x + 9", a: ["x = 8", "x = 1", "x = −1", "x = 16"], c: 1, fb: "x=8." },
+                { t:"5.3", d:2, q: "Solve: x/3 + 4 = 7", a: ["x = 1", "x = 9", "x = 33", "x = 11"], c: 1, fb: "x=9." },
+                { t:"5.3", d:2, q: "Solve: 2(3x + 1) = 4x + 10", a: ["x = 4", "x = 2", "x = 8", "x = −4"], c: 2, fb: "x=4." },
+                { t:"5.3", d:3, q: "Solve: x/2 + x/3 = 10", a: ["x = 12", "x = 30", "x = 15", "x = 6"], c: 1, fb: "x=12." },
+                { t:"5.3", d:3, q: "Solve: 3(2x − 4) = 2(x + 6)", a: ["x = 6", "x = 5", "x = 4", "x = 12"], c: 3, fb: "x=6." },
+                { t:"5.3", d:3, q: "Solve: (2x + 1)/3 = (x − 2)/2", a: ["x = −8", "x = 8", "x = −4", "x = 4"], c: 0, fb: "x=−8." },
+                { t:"5.4", d:1, q: "x + y = 7 and x − y = 3", a: ["x=5,y=2", "x=4,y=3", "x=2,y=5", "x=3,y=4"], c: 2, fb: "x=5, y=2." },
+                { t:"5.4", d:1, q: "2x + y = 9 and x + y = 5", a: ["x=4,y=1", "x=3,y=3", "x=2,y=5", "x=5,y=−1"], c: 2, fb: "x=4, y=1." },
+                { t:"5.4", d:2, q: "Solve: 4x + y = 14 and 2x − y = 4.", a: ["x = 3, y = 2", "x = 2, y = 6", "x = 4, y = −2", "x = 3, y = 4"], c: 0, fb: "x=3, y=2." },
+                { t:"5.4", d:2, q: "3x − y = 5 and 2x + y = 10", a: ["x = 3, y = 4", "x = 4, y = 2", "x = 2, y = 6", "x = 5, y = 0"], c: 3, fb: "x=3, y=4." },
+                { t:"5.4", d:2, q: "Solve by substitution: y = 2x and 3x + y = 10.", a: ["x = 2, y = 4", "x = 5, y = 10", "x = 1, y = 2", "x = 4, y = 2"], c: 3, fb: "x=2, y=4." },
+                { t:"5.4", d:3, q: "Solve: 5x + 2y = 17 and 3x − 2y = 7.", a: ["x = 3, y = 1", "x = 2, y = 3.5", "x = 1, y = 6", "x = 4, y = −1.5"], c: 0, fb: "x=3, y=1." },
+                { t:"5.4", d:3, q: "Solve: 3x + 4y = 18 and 2x − y = 1.", a: ["x = 2, y = 3", "x = 3, y = 2", "x = 1, y = 3.75", "x = 4, y = 1.5"], c: 1, fb: "x=2, y=3." },
+                { t:"5.4", d:3, q: "Two numbers sum to 24, diff is 6. Larger?", a: ["15", "18", "12", "9"], c: 2, fb: "x=15." },
+                { t:"5.4", d:3, q: "Solve: 2x + 5y = 21 and x − y = 0.", a: ["x = 3, y = 3", "x = 5, y = 5", "x = 7, y = 1", "x = 0, y = 4.2"], c: 0, fb: "x=3, y=3." },
+                { t:"5.5", d:1, q: "Gradient of y = 5x − 3?", a: ["−3", "5", "3", "−5"], c: 3, fb: "m=5." },
+                { t:"5.5", d:1, q: "y-intercept of y = 2x + 7?", a: ["(7, 0)", "(0, 2)", "(0, 7)", "(2, 0)"], c: 2, fb: "(0, 7)." },
+                { t:"5.5", d:1, q: "Which point lies on y = 3x − 1?", a: ["(2, 4)", "(1, 4)", "(3, 8)", "(2, 7)"], c: 0, fb: "(3,8)." },
+                { t:"5.5", d:1, q: "Gradient through (0, 2) and (4, 10)?", a: ["2", "0.5", "4", "8"], c: 3, fb: "m=2." },
+                { t:"5.5", d:2, q: "Gradient 3 through (0, −4)?", a: ["y = −4x + 3", "y = 3x + 4", "y = 3x − 4", "y = −3x + 4"], c: 0, fb: "y=3x−4." },
+                { t:"5.5", d:2, q: "x-intercept of y = −2x + 6?", a: ["x = 6", "x = 3", "x = 2", "x = −3"], c: 0, fb: "x=3." },
+                { t:"5.5", d:2, q: "Parallel? y = 4x + 1 and y = 4x − 7", a: ["Perpendicular", "Parallel", "Intersect (0,1)", "Same x-int"], c: 1, fb: "Parallel." },
+                { t:"5.5", d:2, q: "Gradient through (2, 5) and (6, 13)?", a: ["4", "2", "8", "0.5"], c: 1, fb: "m=2." },
+                { t:"5.5", d:2, q: "y = 2x − 3. If x = 0, y =", a: ["0", "3", "−3", "2"], c: 3, fb: "y=−3." },
+                { t:"5.5", d:3, q: "Line through (1, 3) and (4, 12)?", a: ["y = 3x", "y = 3x − 1", "y = 3x + 1", "y = 4x − 1"], c: 0, fb: "y=3x." },
+                { t:"5.5", d:3, q: "Gradient parallel to y = −3x + 5?", a: ["3", "5", "−3", "1/3"], c: 0, fb: "m=−3." },
+                { t:"5.5", d:3, q: "Passes (0, 4) and (2, 0)?", a: ["y = 2x + 4", "y = −2x + 4", "y = 0.5x + 4", "y = −0.5x + 4"], c: 2, fb: "y=−2x+4." }
             ],
             paper2: [
-                { t:"5.1", d:1, q: "Expand/Simplify: 2(3x+4)−3(x−2)", a: "6x+8−3x+6 = 3x+14", fb: "−3×−2 = +6." },
-                // ... (add all your other Paper 2 questions here)
+                { t:"5.1", d:1, q: "Expand/Simplify: 2(3x+4)−3(x−2)", a: "3x+14", fb: "−3×−2 = +6." },
+                { t:"5.1", d:1, q: "3x²−4x+1 when x=−2", a: "21", fb: "3(4)+8+1=21." },
+                { t:"5.1", d:2, q: "Expand: (x+4)(x−7)", a: "x²−3x−28", fb: "−7x+4x=−3x." },
+                { t:"5.1", d:2, q: "Area (x+3)(x+5). Find area when x=2", a: "35", fb: "Expand first." },
+                { t:"5.1", d:2, q: "Simplify: 4(2x−1)+3(x+5)−2(3x−4)", a: "5x+19", fb: "−2×−4=+8." },
+                { t:"5.1", d:3, q: "Show (x+3)²−(x−3)² = 12x", a: "12x", fb: "Expand separately." },
+                { t:"5.1", d:3, q: "Perimeter (2x+1),(3x−2),(x+5). Find P when x=4", a: "28", fb: "Sum sides first." },
+                { t:"5.1", d:3, q: "p=3, q=−2. Find p²+2pq and (p−q)³", a: "−3; 125", fb: "p−q=3−(−2)=5." },
+                { t:"5.2", d:1, q: "Factorise: 15x³−10x²", a: "5x²(3x−2)", fb: "HCF is 5x²." },
+                { t:"5.2", d:1, q: "Factorise: x²+9x+20", a: "(x+4)(x+5)", fb: "4+5=9, 4*5=20." },
+                { t:"5.2", d:2, q: "Factorise: x²−11x+28", a: "(x−4)(x−7)", fb: "−4, −7." },
+                { t:"5.2", d:2, q: "Factorise: 4x²−1", a: "(2x+1)(2x−1)", fb: "DOTS." },
+                { t:"5.2", d:2, q: "Factorise x²+x−12; solve x²+x−12=0", a: "x=−4, 3", fb: "Set brackets to 0." },
+                { t:"5.2", d:2, q: "Show 3(x²−4)=3(x+2)(x−2). Find value when x=5", a: "63", fb: "Use factorised form." },
+                { t:"5.2", d:3, q: "Factorise: 2x²−32", a: "2(x+4)(x−4)", fb: "HCF 2 first." },
+                { t:"5.2", d:3, q: "Factorise: 3x²+10x+3", a: "(3x+1)(x+3)", fb: "ac=9, add 10." },
+                { t:"5.3", d:1, q: "Solve: 4x−3=2x+9", a: "x=6", fb: "Collect terms." },
+                { t:"5.3", d:1, q: "Tripled n+8=29. Solve n", a: "n=7", fb: "n=7." },
+                { t:"5.3", d:2, q: "Solve: 5(2x+3)=3(x−4)+2", a: "x=−25/7", fb: "Expand all." },
+                { t:"5.3", d:2, q: "Solve: x/4−1=x/6+2", a: "x=36", fb: "Multiply by 12." },
+                { t:"5.3", d:2, q: "Consecutive integers sum 75. Solve n", a: "24,25,26", fb: "n=24." },
+                { t:"5.3", d:2, q: "Solve: (3x+2)/5=(x−1)/2", a: "x=−9", fb: "Cross multiply." },
+                { t:"5.3", d:3, q: "Father 4x, son x. In 6y, father 3x(son). Age?", a: "son=12", fb: "Son=12." },
+                { t:"5.3", d:3, q: "Solve: 2(x+1)/3−(x−3)/4=2", a: "x=1.4", fb: "Multiply by 12." },
+                { t:"5.4", d:1, q: "3x+y=11 and x+y=5", a: "x=3, y=2", fb: "2x=6." },
+                { t:"5.4", d:2, q: "2x+3y=12 and 4x−y=5", a: "x=27/14, y=18/7", fb: "Eliminate variable." },
+                { t:"5.4", d:2, q: "Sub: x=3y−1 and 2x+y=12", a: "x=5, y=2", fb: "Substitute carefully." },
+                { t:"5.4", d:2, q: "2 tickets+3 pop=92; 1 ticket+2 pop=54. Price ticket?", a: "P22", fb: "Eq 2*2=108." },
+                { t:"5.4", d:3, q: "3x−2y=8 and 5x+4y=26", a: "x=42/11, y=19/11", fb: "Eliminate y." },
+                { t:"5.4", d:3, q: "Sum 50, x/y=4. Numbers?", a: "x=40, y=10", fb: "x=4y." },
+                { t:"5.4", d:3, q: "3a+5c=200; 2a+4c=152. Prices?", a: "a=20, c=28", fb: "Multiply eqs." },
+                { t:"5.4", d:3, q: "Graph y=2x−1 and y=−x+5 intersection", a: "(2,3)", fb: "Set equal." },
+                { t:"5.5", d:1, q: "y=4x−2. Grad? y-int? x-int?", a: "m=4, (0,−2), (0.5,0)", fb: "Set x=0, y=0." },
+                { t:"5.5", d:1, q: "y=3x+1. Table x=−1,0,1,2,3", a: "−2, 1, 4, 7, 10", fb: "Substitute x." },
+                { t:"5.5", d:2, q: "Line (1,5) and (3,11)", a: "y=3x+2", fb: "Find m then c." },
+                { t:"5.5", d:2, q: "Grad −1/2 through (4,3)", a: "y=−1/2x+5", fb: "3=−2+c." },
+                { t:"5.5", d:2, q: "L1=2x+k, L2=2x−5. L1 through (3,7). Find k, relation", a: "k=1, Parallel", fb: "m is equal." },
+                { t:"5.5", d:2, q: "Speed=60km/h, t=0, d=0. Eq? d at 5h?", a: "d=60t, 300km", fb: "d=vt." },
+                { t:"5.5", d:3, q: "2y−6x=10. y=mx+c? Par line through (0,−1)?", a: "y=3x+5; y=3x−1", fb: "Divide by 2." },
+                { t:"5.5", d:3, q: "A(2,3), B(5,9), C(8,p). Find p", a: "p=15", fb: "y=2x−1." }
             ]
         };
 
@@ -41,26 +132,27 @@
             if (i >= allQuestions.length) {
                 document.getElementById('question').innerText = "Practice Complete!";
                 document.getElementById('options').innerHTML = "";
+                document.getElementById('feedback').innerText = "";
                 return;
             }
-            const q = allQuestions[i];
-            document.getElementById('question').innerText = q.q;
+            const qObj = allQuestions[i];
+            document.getElementById('question').innerText = qObj.q;
             let optDiv = document.getElementById('options');
             optDiv.innerHTML = '';
             
-            if (Array.isArray(q.a)) {
-                q.a.forEach((opt, idx) => {
+            if (Array.isArray(qObj.a)) {
+                qObj.a.forEach((opt, idx) => {
                     let btn = document.createElement('div');
                     btn.className = 'option';
                     btn.innerText = opt;
                     btn.onclick = () => {
-                        document.getElementById('feedback').innerText = (idx === q.c ? "Correct! " : "Pitfall: ") + q.fb;
+                        document.getElementById('feedback').innerText = (idx === qObj.c ? "Correct! " : "Pitfall: ") + qObj.fb;
                         showNext();
                     };
                     optDiv.appendChild(btn);
                 });
             } else {
-                optDiv.innerHTML = "<p><strong>Answer:</strong> " + q.a + "</p>";
+                optDiv.innerHTML = "<p><strong>Model Answer:</strong> " + qObj.a + "</p>";
                 showNext();
             }
         }

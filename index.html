@@ -3,48 +3,77 @@
 <head>
     <meta charset="UTF-8">
     <title>MamPhem Exam Simulator</title>
+    <style>
+        body { font-family: sans-serif; background: #f4f4f4; padding: 20px; }
+        .card { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .header { background: #003366; color: #C5A059; padding: 15px; text-align: center; border-radius: 8px 8px 0 0; }
+        .option { display: block; margin: 10px 0; padding: 12px; border: 1px solid #ddd; border-radius: 5px; cursor: pointer; }
+        .option:hover { background: #eef; }
+        #feedback { font-weight: bold; margin-top: 15px; padding: 10px; border-radius: 5px; }
+        button { background: #C5A059; color: white; border: none; padding: 10px 20px; width: 100%; border-radius: 5px; cursor: pointer; margin-top: 10px; }
+    </style>
 </head>
 <body>
-    <h2 id="question">Loading...</h2>
-    <div id="options"></div>
-    <div id="feedback"></div>
+    <div class="card">
+        <div class="header"><h2>MamPhem Exam Simulator</h2></div>
+        <p id="question"></p>
+        <div id="options"></div>
+        <div id="feedback"></div>
+    </div>
 
     <script>
-        console.log("Script starting...");
-        
+        // Your complete 100-question object
         const questionBank = {
             paper1: [
-                { t:"5.1", d:1, q: "Simplify: 3x + 5y + 2x − y", a: ["5x + 4y", "5x − 4y", "5x + 6y", "1x + 4y"], c: 2, fb: "Collect x-terms and y-terms separately." }
+                { t:"5.1", d:1, q: "Simplify: 3x + 5y + 2x − y", a: ["5x + 4y", "5x − 4y", "5x + 6y", "1x + 4y"], c: 2, fb: "Collect x and y terms." },
+                // ... (add all your other Paper 1 questions here)
             ],
             paper2: [
-                { t:"5.1", d:1, q: "Expand and simplify: 2(3x + 4) − 3(x − 2). Show all working. [3 marks]", a: "2(3x+4)−3(x−2) = 6x+8−3x+6 = 3x+14", fb: "Watch the signs." }
+                { t:"5.1", d:1, q: "Expand/Simplify: 2(3x+4)−3(x−2)", a: "6x+8−3x+6 = 3x+14", fb: "−3×−2 = +6." },
+                // ... (add all your other Paper 2 questions here)
             ]
         };
 
         const allQuestions = [...questionBank.paper1, ...questionBank.paper2];
-        console.log("Total questions loaded: " + allQuestions.length);
         let i = 0;
 
         function loadQ() {
-            console.log("Loading question index: " + i);
             if (i >= allQuestions.length) {
                 document.getElementById('question').innerText = "Practice Complete!";
+                document.getElementById('options').innerHTML = "";
                 return;
             }
+            const q = allQuestions[i];
+            document.getElementById('question').innerText = q.q;
+            let optDiv = document.getElementById('options');
+            optDiv.innerHTML = '';
             
-            const qObj = allQuestions[i];
-            document.getElementById('question').innerText = qObj.q;
-            
-            // If this line crashes, the error will finally show in the Console
-            try {
-                // ... (your existing logic here)
-            } catch(e) {
-                console.error("Error loading question: ", e);
+            if (Array.isArray(q.a)) {
+                q.a.forEach((opt, idx) => {
+                    let btn = document.createElement('div');
+                    btn.className = 'option';
+                    btn.innerText = opt;
+                    btn.onclick = () => {
+                        document.getElementById('feedback').innerText = (idx === q.c ? "Correct! " : "Pitfall: ") + q.fb;
+                        showNext();
+                    };
+                    optDiv.appendChild(btn);
+                });
+            } else {
+                optDiv.innerHTML = "<p><strong>Answer:</strong> " + q.a + "</p>";
+                showNext();
             }
         }
-        
+
+        function showNext() {
+            if (!document.getElementById('nextBtn')) {
+                let n = document.createElement('button');
+                n.id = 'nextBtn'; n.innerText = "Next Question";
+                n.onclick = () => { document.getElementById('feedback').innerText = ""; i++; loadQ(); };
+                document.getElementById('options').appendChild(n);
+            }
+        }
         loadQ();
-        console.log("Script finished.");
     </script>
 </body>
 </html>

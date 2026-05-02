@@ -3,65 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <title>MamPhem Exam Simulator</title>
-    <style>
-        body { font-family: sans-serif; background: #f4f4f4; padding: 20px; }
-        .card { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .header { background: #003366; color: #C5A059; padding: 15px; text-align: center; }
-        .option { display: block; margin: 10px 0; padding: 12px; border: 1px solid #ddd; cursor: pointer; }
-        button { background: #C5A059; color: white; border: none; padding: 10px; width: 100%; cursor: pointer; }
-    </style>
 </head>
 <body>
-    <div class="card">
-        <div class="header"><h2>MamPhem Exam Simulator</h2></div>
-        <p id="question">Loading questions...</p>
-        <div id="options"></div>
-        <div id="feedback"></div>
-    </div>
+    <h2 id="question">Loading...</h2>
+    <div id="options"></div>
+    <div id="feedback"></div>
 
     <script>
-        // We will load a small test set first to see if it works
-        const paper1 = [{ q: "3x + 5y + 2x − y", a: ["5x+4y", "5x−4y"], c: 0, fb: "Collect terms." }];
-        const paper2 = [{ q: "Expand 2(3x+4)", a: "6x+8", fb: "Multiply through." }];
+        console.log("Script starting...");
         
-        const allQuestions = [...paper1, ...paper2];
+        const questionBank = {
+            paper1: [
+                { t:"5.1", d:1, q: "Simplify: 3x + 5y + 2x − y", a: ["5x + 4y", "5x − 4y", "5x + 6y", "1x + 4y"], c: 2, fb: "Collect x-terms and y-terms separately." }
+            ],
+            paper2: [
+                { t:"5.1", d:1, q: "Expand and simplify: 2(3x + 4) − 3(x − 2). Show all working. [3 marks]", a: "2(3x+4)−3(x−2) = 6x+8−3x+6 = 3x+14", fb: "Watch the signs." }
+            ]
+        };
+
+        const allQuestions = [...questionBank.paper1, ...questionBank.paper2];
+        console.log("Total questions loaded: " + allQuestions.length);
         let i = 0;
 
         function loadQ() {
+            console.log("Loading question index: " + i);
             if (i >= allQuestions.length) {
-                document.getElementById('question').innerText = "All done!";
+                document.getElementById('question').innerText = "Practice Complete!";
                 return;
             }
-            const q = allQuestions[i];
-            document.getElementById('question').innerText = q.q;
-            let optDiv = document.getElementById('options');
-            optDiv.innerHTML = '';
             
-            if (Array.isArray(q.a)) {
-                q.a.forEach((opt, idx) => {
-                    let btn = document.createElement('div');
-                    btn.className = 'option';
-                    btn.innerText = opt;
-                    btn.onclick = () => { 
-                        document.getElementById('feedback').innerText = "Feedback: " + q.fb;
-                        showNext();
-                    };
-                    optDiv.appendChild(btn);
-                });
-            } else {
-                optDiv.innerHTML = "<p>Answer: " + q.a + "</p>";
-                showNext();
+            const qObj = allQuestions[i];
+            document.getElementById('question').innerText = qObj.q;
+            
+            // If this line crashes, the error will finally show in the Console
+            try {
+                // ... (your existing logic here)
+            } catch(e) {
+                console.error("Error loading question: ", e);
             }
         }
-
-        function showNext() {
-            let n = document.createElement('button');
-            n.innerText = "Next";
-            n.onclick = () => { i++; loadQ(); };
-            document.getElementById('options').appendChild(n);
-        }
-
+        
         loadQ();
+        console.log("Script finished.");
     </script>
 </body>
 </html>

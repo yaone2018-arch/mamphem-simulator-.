@@ -1,46 +1,65 @@
-<script>
-    const questions = [
-        // ... (Keep your full 100-question list here)
-        { t: "5.1", q: "Simplify: 5x + 3y - 2x + y", a: ["3x + 4y", "7x + 2y", "3x + 2y", "6x+4y"], c: 0, fb: "Collect like terms!" },
-        { t: "5.2", q: "Solve for x: 2(x+3) = 10", a: ["x=2", "x=4", "x=5", "x=3"], c: 0, fb: "Expand first: 2x+6=10" }
-    ];
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MamPhem Exam Simulator</title>
+    <style>
+        body { font-family: sans-serif; background: #f4f4f4; padding: 20px; }
+        .card { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .header { background: #003366; color: #C5A059; padding: 15px; text-align: center; border-radius: 8px 8px 0 0; }
+        .option { display: block; margin: 10px 0; padding: 12px; border: 1px solid #ddd; border-radius: 5px; cursor: pointer; }
+        .option:hover { background: #eef; }
+        #feedback { font-weight: bold; margin-top: 15px; padding: 10px; border-radius: 5px; }
+        button { background: #C5A059; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="header"><h2>MamPhem Exam Simulator</h2></div>
+        <div id="quiz">
+            <p id="question">Loading...</p>
+            <div id="options"></div>
+            <div id="feedback"></div>
+        </div>
+    </div>
 
-    let currentIndex = 0;
+    <script>
+        const questions = [
+            { q: "Simplify: 5x + 3y - 2x + y", a: ["3x + 4y", "7x + 2y", "3x + 2y", "6x+4y"], c: 0, fb: "Collect the x's and y's separately." },
+            { q: "Expand: 3(2x - 4)", a: ["6x - 4", "6x - 12", "5x - 7", "6x+12"], c: 1, fb: "Multiply 3 by BOTH 2x and -4." },
+            { q: "Solve for x: 2x + 5 = 11", a: ["x=3", "x=8", "x=6", "x=2"], c: 0, fb: "Subtract 5, then divide by 2." }
+        ];
 
-    function loadQuestion(i) {
-        if (i >= questions.length) {
-            document.getElementById('quiz').innerHTML = "<h2>Practice Complete!</h2>";
-            return;
+        let i = 0;
+        function loadQ() {
+            document.getElementById('question').innerText = questions[i].q;
+            let optDiv = document.getElementById('options');
+            optDiv.innerHTML = '';
+            questions[i].a.forEach((opt, idx) => {
+                let btn = document.createElement('div');
+                btn.className = 'option';
+                btn.innerText = opt;
+                btn.onclick = () => {
+                    let feed = document.getElementById('feedback');
+                    if (idx === questions[i].c) {
+                        feed.innerText = "Correct! [A1]";
+                        feed.style.background = "#d4edda";
+                    } else {
+                        feed.innerText = "Try again: " + questions[i].fb;
+                        feed.style.background = "#f8d7da";
+                    }
+                    if (!document.getElementById('nextBtn')) {
+                        let n = document.createElement('button');
+                        n.id = 'nextBtn'; n.innerText = "Next Question";
+                        n.onclick = () => { i++; i < questions.length ? loadQ() : alert("Done!"); };
+                        optDiv.appendChild(n);
+                    }
+                };
+                optDiv.appendChild(btn);
+            });
         }
-        document.getElementById('question').innerText = questions[i].q;
-        const optDiv = document.getElementById('options');
-        optDiv.innerHTML = '';
-        questions[i].a.forEach((opt, idx) => {
-            let btn = document.createElement('div');
-            btn.className = 'option';
-            btn.innerText = opt;
-            btn.onclick = () => check(idx, questions[i].c, questions[i].fb);
-            optDiv.appendChild(btn);
-        });
-    }
-
-    function check(sel, cor, fb) {
-        const feed = document.getElementById('feedback');
-        feed.innerText = (sel === cor) ? "Correct! [A1]" : "Try again: " + fb;
-        feed.style.background = (sel === cor) ? "#d4edda" : "#f8d7da";
-        
-        // Add a "Next" button after answering
-        let nextBtn = document.createElement('button');
-        nextBtn.innerText = "Next Question";
-        nextBtn.className = "option";
-        nextBtn.onclick = () => {
-            currentIndex++;
-            loadQuestion(currentIndex);
-            feed.innerText = "";
-            feed.style.background = "none";
-        };
-        document.getElementById('options').appendChild(nextBtn);
-    }
-    
-    loadQuestion(0);
-</script>
+        loadQ();
+    </script>
+</body>
+</html>
